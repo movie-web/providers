@@ -17,13 +17,14 @@ export const upstreamScraper = makeEmbed({
 
     if (packed) {
       const unpacked = unpacker.unpack(packed[1]);
+
       const link = unpacked.match(linkRegex);
 
       if (link) {
         return {
           stream: {
             type: 'hls',
-            playlist: link[1],
+            playlist: link[1].startsWith('http') ? link[1] : `https://s30.upstreamcdn.co${link[1]}`,
             flags: [flags.NO_CORS],
             captions: [],
           },

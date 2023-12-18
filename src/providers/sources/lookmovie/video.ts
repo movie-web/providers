@@ -33,7 +33,23 @@ export async function getVideoUrl(
   const videoSources = data.streams;
 
   // Find video URL and return it
-  const opts = ['auto', '1080p', '1080', '720p', '720', '480p', '480', '240p', '240', '360p', '360', '144', '144p'];
+  const opts = [
+    'auto',
+    '4K',
+    '4k',
+    '1080p',
+    '1080',
+    '720p',
+    '720',
+    '480p',
+    '480',
+    '240p',
+    '240',
+    '360p',
+    '360',
+    '144',
+    '144p',
+  ];
 
   let videoUrl: string | null = null;
   for (const res of opts) {

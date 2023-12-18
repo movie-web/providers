@@ -70,7 +70,7 @@ function getAllSources() {
 // * Defined here cuz ESLint didn't like the order these were defined in
 const sources = getAllSources();
 
-async function makeTMDBRequest(url: string): Promise<Response> {
+async function makeTMDBRequest(url: string, appendToResponse?: string): Promise<Response> {
   const headers: {
     accept: 'application/json';
     authorization?: string;
@@ -78,27 +78,26 @@ async function makeTMDBRequest(url: string): Promise<Response> {
     accept: 'application/json',
   };
 
-  // * Used to get around ESLint
-  // * Assignment to function parameter 'url'. eslint (no-param-reassign)
-  let requestURL = url;
+  const requestURL = new URL(url);
 
-  // * JWT keys always start with ey and are ONLY valid as a header.
-  // * All other keys are ONLY valid as a query param.
-  // * Thanks TMDB.
   if (TMDB_API_KEY.startsWith('ey')) {
     headers.authorization = `Bearer ${TMDB_API_KEY}`;
   } else {
-    requestURL += `?api_key=${TMDB_API_KEY}`;
+    requestURL.searchParams.append('api_key', TMDB_API_KEY);
   }
 
-  return fetch(requestURL, {
+  if (appendToResponse) {
+    requestURL.searchParams.append('append_to_response', appendToResponse);
+  }
+
+  return fetch(requestURL.toString(), {
     method: 'GET',
     headers,
   });
 }
 
 async function getMovieMediaDetails(id: string): Promise<MovieMedia> {
-  const response = await makeTMDBRequest(`https://api.themoviedb.org/3/movie/${id}`);
+  const response = await makeTMDBRequest(`https://api.themoviedb.org/3/movie/${id}`, 'external_ids');
   const movie = await response.json();
 
   if (movie.success === false) {
@@ -114,13 +113,14 @@ async function getMovieMediaDetails(id: string): Promise<MovieMedia> {
     title: movie.title,
     releaseYear: Number(movie.release_date.split('-')[0]),
     tmdbId: id,
+    imdbId: movie.imdb_id,
   };
 }
 
 async function getShowMediaDetails(id: string, seasonNumber: string, episodeNumber: string): Promise<ShowMedia> {
   // * TV shows require the TMDB ID for the series, season, and episode
   // * and the name of the series. Needs multiple requests
-  let response = await makeTMDBRequest(`https://api.themoviedb.org/3/tv/${id}`);
+  let response = await makeTMDBRequest(`https://api.themoviedb.org/3/tv/${id}`, 'external_ids');
   const series = await response.json();
 
   if (series.success === false) {
@@ -152,6 +152,7 @@ async function getShowMediaDetails(id: string, seasonNumber: string, episodeNumb
     title: series.name,
     releaseYear: Number(series.first_air_date.split('-')[0]),
     tmdbId: id,
+    imdbId: series.external_ids.imdb_id,
     episode: {
       number: episode.episode_number,
       tmdbId: episode.id,
