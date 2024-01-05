@@ -17,8 +17,11 @@ import { showboxScraper } from '@/providers/sources/showbox/index';
 import { vidsrcScraper } from '@/providers/sources/vidsrc/index';
 import { zoechipScraper } from '@/providers/sources/zoechip';
 
+import { closeLoadScraper } from './embeds/closeload';
+import { ridooScraper } from './embeds/ridoo';
 import { smashyStreamDScraper } from './embeds/smashystream/dued';
 import { smashyStreamFScraper } from './embeds/smashystream/video1';
+import { ridooMoviesScraper } from './sources/ridomovies';
 import { smashyStreamScraper } from './sources/smashystream';
 
 export function gatherAllSources(): Array<Sourcerer> {
@@ -33,6 +36,7 @@ export function gatherAllSources(): Array<Sourcerer> {
     vidsrcScraper,
     lookmovieScraper,
     smashyStreamScraper,
+    ridooMoviesScraper,
   ];
 }
 
@@ -50,5 +54,7 @@ export function gatherAllEmbeds(): Array<Embed> {
     streambucketScraper,
     smashyStreamFScraper,
     smashyStreamDScraper,
+    ridooScraper,
+    closeLoadScraper,
   ];
 }
